@@ -1,0 +1,2119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KBS Heritage Portal – Enhanced Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ===== CSS VARIABLES ===== */
+  :root {
+    --primary: #1a3a6e;
+    --primary-light: #2451a0;
+    --primary-muted: #e8eef8;
+    --accent: #c9870a;
+    --accent-light: #fef3c7;
+    --sidebar-bg: #0f2347;
+    --sidebar-text: #c8d8f0;
+    --sidebar-active: #2451a0;
+    --sidebar-hover: #1a3a6e;
+    --bg: #f1f5fb;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --muted: #64748b;
+    --text: #1e293b;
+    --green: #059669;
+    --green-light: #d1fae5;
+    --amber: #d97706;
+    --amber-light: #fef3c7;
+    --red: #dc2626;
+    --red-light: #fee2e2;
+    --teal: #0891b2;
+    --teal-light: #cffafe;
+    --purple: #7c3aed;
+    --purple-light: #ede9fe;
+    --pink: #db2777;
+    --pink-light: #fce7f3;
+    --indigo: #4338ca;
+    --indigo-light: #e0e7ff;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow: 0 4px 16px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* ===== APP SHELL ===== */
+  .app { display: flex; min-height: 100vh; }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar {
+    width: 260px; min-width: 260px; background: var(--sidebar-bg);
+    display: flex; flex-direction: column; position: relative;
+    box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+  }
+  .sidebar-logo {
+    padding: 22px 20px 18px; border-bottom: 1px solid rgba(255,255,255,0.08);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .sidebar-logo-icon {
+    width: 42px; height: 42px; background: linear-gradient(135deg, #3b82f6, #1a3a6e);
+    border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    font-size: 20px; box-shadow: 0 4px 12px rgba(59,130,246,0.4);
+  }
+  .sidebar-logo-text { color: #fff; font-weight: 800; font-size: 17px; line-height: 1.2; }
+  .sidebar-logo-sub { color: var(--sidebar-text); font-size: 11px; font-weight: 500; opacity: 0.7; }
+
+  .role-badge {
+    margin: 14px 16px 4px; padding: 8px 14px; border-radius: 8px;
+    background: rgba(255,255,255,0.07); display: flex; align-items: center; gap: 8px;
+  }
+  .role-dot { width: 8px; height: 8px; border-radius: 50%; background: #34d399; flex-shrink: 0; }
+  .role-name { color: #a5c4f0; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+
+  .sidebar-nav { flex: 1; padding: 8px 12px; overflow-y: auto; }
+  .nav-section-label {
+    color: rgba(255,255,255,0.3); font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.12em; padding: 10px 12px 4px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px; padding: 10px 14px;
+    border-radius: 9px; cursor: pointer; transition: all 0.18s ease;
+    color: var(--sidebar-text); font-size: 13.5px; font-weight: 500;
+    margin-bottom: 2px; text-decoration: none;
+  }
+  .nav-item:hover { background: var(--sidebar-hover); color: #fff; }
+  .nav-item.active { background: var(--sidebar-active); color: #fff; box-shadow: 0 3px 10px rgba(36,81,160,0.5); }
+  .nav-item .nav-icon { width: 20px; height: 20px; opacity: 0.85; flex-shrink: 0; font-size: 16px; text-align: center; }
+  .nav-item .badge-count {
+    margin-left: auto; background: var(--accent); color: #fff;
+    font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px;
+  }
+  .nav-item .badge-new {
+    margin-left: auto; background: #ef4444; color: #fff;
+    font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px;
+  }
+
+  .sidebar-footer {
+    padding: 14px 16px; border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .user-info { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 700; font-size: 15px; flex-shrink: 0;
+  }
+  .user-name { color: #fff; font-size: 13px; font-weight: 600; }
+  .user-email { color: var(--sidebar-text); font-size: 11px; opacity: 0.7; }
+  .logout-btn {
+    width: 100%; padding: 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
+    background: transparent; color: var(--sidebar-text); cursor: pointer;
+    font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px;
+    transition: all 0.18s;
+  }
+  .logout-btn:hover { background: rgba(239,68,68,0.15); color: #f87171; border-color: rgba(239,68,68,0.3); }
+
+  /* ===== MAIN CONTENT ===== */
+  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+  .topbar {
+    height: 60px; background: #fff; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px; box-shadow: var(--shadow-sm); flex-shrink: 0;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 14px; }
+  .topbar-breadcrumb { font-size: 13px; color: var(--muted); }
+  .topbar-breadcrumb span { color: var(--text); font-weight: 600; }
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .topbar-icon-btn {
+    width: 36px; height: 36px; border-radius: 9px; border: 1px solid var(--border);
+    background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; color: var(--muted); transition: all 0.15s; position: relative;
+  }
+  .topbar-icon-btn:hover { background: var(--primary-muted); color: var(--primary); }
+  .notif-dot {
+    position: absolute; top: 5px; right: 5px; width: 8px; height: 8px;
+    background: #ef4444; border-radius: 50%; border: 2px solid #fff;
+  }
+  .topbar-greeting { font-size: 13px; color: var(--muted); }
+  .topbar-greeting b { color: var(--text); }
+
+  .content { flex: 1; overflow-y: auto; padding: 28px 28px; }
+
+  /* ===== ROLE SWITCHER ===== */
+  .role-switcher {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 12px 16px; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    box-shadow: var(--shadow-sm);
+  }
+  .role-switcher-label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  .role-btn {
+    padding: 6px 14px; border-radius: 20px; border: 1.5px solid var(--border);
+    background: #fff; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--muted);
+    transition: all 0.15s; font-family: inherit;
+  }
+  .role-btn:hover { border-color: var(--primary); color: var(--primary); }
+  .role-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+  /* ===== PAGE SECTIONS ===== */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ===== PAGE HEADER ===== */
+  .page-header { margin-bottom: 24px; }
+  .page-header h1 { font-size: 24px; font-weight: 800; color: var(--text); line-height: 1.2; }
+  .page-header p { color: var(--muted); font-size: 14px; margin-top: 4px; }
+  .page-header-row { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+
+  /* ===== STAT CARDS ===== */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .stat-card {
+    background: var(--card); border-radius: var(--radius); padding: 20px;
+    border: 1px solid var(--border); box-shadow: var(--shadow-sm);
+    transition: all 0.2s; cursor: default;
+  }
+  .stat-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+  .stat-card-top { display: flex; align-items: flex-start; justify-content: space-between; }
+  .stat-card-icon {
+    width: 46px; height: 46px; border-radius: 11px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; box-shadow: var(--shadow-sm);
+  }
+  .stat-card-icon.blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+  .stat-card-icon.green { background: linear-gradient(135deg, #10b981, #047857); }
+  .stat-card-icon.amber { background: linear-gradient(135deg, #f59e0b, #b45309); }
+  .stat-card-icon.teal { background: linear-gradient(135deg, #06b6d4, #0e7490); }
+  .stat-card-icon.red { background: linear-gradient(135deg, #ef4444, #b91c1c); }
+  .stat-card-icon.purple { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+  .stat-card-label { color: var(--muted); font-size: 12px; font-weight: 600; margin-top: 14px; }
+  .stat-card-value { font-size: 30px; font-weight: 800; color: var(--text); line-height: 1.1; margin-top: 4px; }
+  .stat-card-trend { font-size: 11px; font-weight: 600; color: var(--green); margin-top: 4px; }
+
+  /* ===== CARDS ===== */
+  .card {
+    background: var(--card); border-radius: var(--radius);
+    border: 1px solid var(--border); box-shadow: var(--shadow-sm);
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 16px 20px 12px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .card-title { font-size: 14px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
+  .card-body { padding: 16px 20px; }
+  .card-footer { padding: 12px 20px; border-top: 1px solid var(--border); background: #f8fafc; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+  @media(max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+  /* ===== ANNOUNCEMENT WIDGET ===== */
+  .announcement-item {
+    display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border);
+  }
+  .announcement-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .ann-icon {
+    width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .ann-icon.global { background: var(--primary-muted); }
+  .ann-icon.state { background: var(--teal-light); }
+  .ann-icon.event { background: var(--green-light); }
+  .ann-icon.alert { background: var(--red-light); }
+  .ann-badge {
+    display: inline-flex; align-items: center; padding: 2px 8px;
+    border-radius: 20px; font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .ann-badge.global { background: var(--primary-muted); color: var(--primary); }
+  .ann-badge.state { background: var(--teal-light); color: var(--teal); }
+  .ann-badge.event { background: var(--green-light); color: var(--green); }
+  .ann-badge.alert { background: var(--red-light); color: var(--red); }
+  .ann-badge.upasabha { background: var(--purple-light); color: var(--purple); }
+  .ann-title { font-size: 13.5px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+  .ann-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .ann-meta { font-size: 11px; color: #94a3b8; margin-top: 5px; display: flex; align-items: center; gap: 8px; }
+  .read-more { font-size: 11px; color: var(--primary); font-weight: 600; cursor: pointer; text-decoration: none; }
+  .read-more:hover { text-decoration: underline; }
+
+  /* ===== EVENT ITEMS ===== */
+  .event-item {
+    display: flex; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border); align-items: flex-start;
+  }
+  .event-item:last-child { border-bottom: none; }
+  .event-date-box {
+    width: 44px; height: 50px; border-radius: 10px; background: var(--primary);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    flex-shrink: 0; color: #fff;
+  }
+  .event-day { font-size: 18px; font-weight: 800; line-height: 1; }
+  .event-month { font-size: 10px; font-weight: 700; text-transform: uppercase; opacity: 0.8; }
+  .event-title { font-size: 13.5px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+  .event-loc { font-size: 12px; color: var(--muted); }
+  .event-tag {
+    display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 20px;
+    font-size: 10px; font-weight: 700; background: var(--accent-light); color: var(--accent);
+    margin-top: 4px;
+  }
+
+  /* ===== BUTTONS ===== */
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 9px 18px; border-radius: 8px; font-size: 13px; font-weight: 600;
+    cursor: pointer; border: none; transition: all 0.15s; font-family: inherit;
+    text-decoration: none;
+  }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: var(--primary-light); box-shadow: 0 4px 12px rgba(26,58,110,0.3); }
+  .btn-outline { background: #fff; color: var(--primary); border: 1.5px solid var(--primary); }
+  .btn-outline:hover { background: var(--primary-muted); }
+  .btn-sm { padding: 6px 14px; font-size: 12px; }
+  .btn-success { background: var(--green); color: #fff; }
+  .btn-success:hover { background: #047857; }
+  .btn-danger { background: var(--red); color: #fff; }
+  .btn-danger:hover { background: #b91c1c; }
+  .btn-amber { background: var(--amber); color: #fff; }
+  .btn-amber:hover { background: #b45309; }
+  .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+  .btn-ghost:hover { background: var(--bg); color: var(--text); }
+
+  /* ===== BADGES ===== */
+  .badge {
+    display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 700;
+  }
+  .badge-pending { background: var(--amber-light); color: var(--amber); }
+  .badge-approved { background: var(--green-light); color: var(--green); }
+  .badge-rejected { background: var(--red-light); color: var(--red); }
+  .badge-global { background: var(--primary-muted); color: var(--primary); }
+  .badge-state { background: var(--teal-light); color: var(--teal); }
+  .badge-upasabha { background: var(--purple-light); color: var(--purple); }
+  .badge-district { background: var(--indigo-light); color: var(--indigo); }
+  .badge-member { background: var(--pink-light); color: var(--pink); }
+  .badge-enabled { background: var(--green-light); color: var(--green); }
+  .badge-disabled { background: #f1f5f9; color: #94a3b8; }
+
+  /* ===== TABLE ===== */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { padding: 11px 14px; text-align: left; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 2px solid var(--border); background: #f8fafc; }
+  td { padding: 12px 14px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #f8fafc; }
+
+  /* ===== FORM ===== */
+  .form-group { margin-bottom: 18px; }
+  .form-label { display: block; font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .form-control {
+    width: 100%; padding: 10px 14px; border-radius: 8px; border: 1.5px solid var(--border);
+    font-size: 13px; font-family: inherit; color: var(--text); background: #fff; outline: none;
+    transition: border-color 0.15s;
+  }
+  .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26,58,110,0.08); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media(max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+  select.form-control { cursor: pointer; }
+  textarea.form-control { resize: vertical; min-height: 80px; }
+
+  /* ===== COMING SOON ===== */
+  .coming-soon {
+    text-align: center; padding: 80px 20px; 
+  }
+  .coming-soon-icon { font-size: 64px; margin-bottom: 20px; }
+  .coming-soon h2 { font-size: 28px; font-weight: 800; color: var(--text); margin-bottom: 10px; }
+  .coming-soon p { color: var(--muted); font-size: 15px; max-width: 360px; margin: 0 auto 24px; }
+  .coming-soon-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--amber-light); color: var(--amber); font-size: 12px; font-weight: 700;
+    padding: 8px 18px; border-radius: 24px; text-transform: uppercase; letter-spacing: 0.08em;
+  }
+
+  /* ===== TOGGLE SWITCH ===== */
+  .toggle { position: relative; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+  .toggle input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .toggle-track {
+    width: 40px; height: 22px; border-radius: 11px; background: #cbd5e1;
+    transition: background 0.2s; flex-shrink: 0;
+  }
+  .toggle input:checked + .toggle-track { background: var(--green); }
+  .toggle-thumb {
+    position: absolute; left: 3px; top: 3px; width: 16px; height: 16px;
+    border-radius: 50%; background: #fff; transition: transform 0.2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2); pointer-events: none;
+  }
+  .toggle input:checked ~ .toggle-thumb { transform: translateX(18px); }
+
+  /* ===== MEMBER ACCESS TABLE ===== */
+  .access-row { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .access-row:last-child { border-bottom: none; }
+
+  /* ===== DISTRICT HIERARCHY ===== */
+  .hierarchy-tree { padding: 10px 0; }
+  .hier-node {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; margin: 4px 0; border-radius: 9px;
+    border: 1px solid var(--border); background: #fff; font-size: 13px;
+  }
+  .hier-node-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .hier-node.global .hier-node-icon { background: var(--primary); color: #fff; }
+  .hier-node.state .hier-node-icon { background: var(--teal-light); color: var(--teal); }
+  .hier-node.district .hier-node-icon { background: var(--indigo-light); color: var(--indigo); }
+  .hier-node.upasabha .hier-node-icon { background: var(--purple-light); color: var(--purple); }
+  .hier-node.member .hier-node-icon { background: var(--pink-light); color: var(--pink); }
+  .hier-node-label { font-weight: 700; color: var(--text); }
+  .hier-node-sub { font-size: 11px; color: var(--muted); }
+  .hier-new-badge { margin-left: auto; background: var(--amber-light); color: var(--amber); font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 20px; text-transform: uppercase; }
+  .hier-indent-1 { margin-left: 20px; }
+  .hier-indent-2 { margin-left: 40px; }
+  .hier-indent-3 { margin-left: 60px; }
+  .hier-indent-4 { margin-left: 80px; }
+  .hier-connector { width: 2px; height: 16px; background: var(--border); margin-left: 35px; }
+
+  /* ===== ALERT BANNER ===== */
+  .alert-banner {
+    display: flex; align-items: flex-start; gap: 12px; padding: 14px 18px;
+    border-radius: 10px; margin-bottom: 18px; font-size: 13px;
+  }
+  .alert-banner.info { background: var(--primary-muted); border: 1px solid #bfdbfe; color: var(--primary); }
+  .alert-banner.success { background: var(--green-light); border: 1px solid #a7f3d0; color: #065f46; }
+  .alert-banner.warning { background: var(--amber-light); border: 1px solid #fde68a; color: #92400e; }
+  .alert-banner.error { background: var(--red-light); border: 1px solid #fecaca; color: #991b1b; }
+  .alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  /* ===== PERMISSIONS TABLE ===== */
+  .perm-table th, .perm-table td { text-align: center; }
+  .perm-table td:first-child { text-align: left; }
+  .perm-check { color: var(--green); font-size: 16px; }
+  .perm-cross { color: #cbd5e1; font-size: 16px; }
+  .perm-partial { color: var(--amber); font-size: 16px; }
+
+  /* ===== LOCALIZED MSG ===== */
+  .localized-card {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    border-radius: var(--radius); padding: 22px; color: #fff; margin-bottom: 24px;
+    position: relative; overflow: hidden;
+  }
+  .localized-card::after {
+    content: ''; position: absolute; right: -30px; top: -30px;
+    width: 120px; height: 120px; border-radius: 50%; background: rgba(255,255,255,0.06);
+  }
+  .localized-card-title { font-size: 16px; font-weight: 800; margin-bottom: 6px; }
+  .localized-card-text { font-size: 13px; opacity: 0.85; line-height: 1.6; }
+  .localized-card-scope { font-size: 11px; margin-top: 10px; opacity: 0.65; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+
+  /* ===== CSHTML INDICATOR ===== */
+  .cshtml-note {
+    background: #0f172a; color: #7dd3fc; font-size: 11px; font-family: 'Courier New', monospace;
+    padding: 8px 14px; border-radius: 6px; margin-bottom: 10px; display: inline-flex; align-items: center; gap: 8px;
+  }
+  .cshtml-note .tag { color: #c084fc; }
+  .cshtml-note .attr { color: #fbbf24; }
+
+  /* ===== UTILITY ===== */
+  .flex { display: flex; }
+  .items-center { align-items: center; }
+  .gap-2 { gap: 8px; }
+  .gap-3 { gap: 12px; }
+  .mb-4 { margin-bottom: 16px; }
+  .mb-6 { margin-bottom: 24px; }
+  .mt-2 { margin-top: 8px; }
+  .text-muted { color: var(--muted); font-size: 12px; }
+  .text-sm { font-size: 13px; }
+  .fw-700 { font-weight: 700; }
+  .ml-auto { margin-left: auto; }
+
+  /* ===== LOGIN PAGE ===== */
+  #login-page {
+    min-height: 100vh; background: linear-gradient(135deg, #0f2347 0%, #1a3a6e 50%, #0e4d92 100%);
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+  }
+  .login-card {
+    width: 100%; max-width: 420px; background: rgba(255,255,255,0.97);
+    border-radius: 20px; box-shadow: 0 25px 60px rgba(0,0,0,0.3); overflow: hidden;
+  }
+  .login-header { background: var(--primary); padding: 32px 32px 28px; text-align: center; }
+  .login-logo { width: 64px; height: 64px; background: rgba(255,255,255,0.15); border-radius: 16px; margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+  .login-title { color: #fff; font-size: 22px; font-weight: 800; }
+  .login-sub { color: rgba(255,255,255,0.7); font-size: 13px; margin-top: 4px; }
+  .login-body { padding: 28px 32px 32px; }
+  .login-roles { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+  .login-role-btn {
+    flex: 1; min-width: 80px; padding: 9px 10px; border-radius: 9px;
+    border: 2px solid var(--border); background: #fff; cursor: pointer;
+    font-size: 11px; font-weight: 700; color: var(--muted); font-family: inherit;
+    transition: all 0.15s; text-align: center; line-height: 1.3;
+  }
+  .login-role-btn:hover { border-color: var(--primary); color: var(--primary); }
+  .login-role-btn.selected { border-color: var(--primary); background: var(--primary); color: #fff; }
+  .login-input {
+    width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 9px;
+    font-size: 14px; font-family: inherit; outline: none; margin-bottom: 14px;
+    transition: border-color 0.15s;
+  }
+  .login-input:focus { border-color: var(--primary); }
+  .login-btn {
+    width: 100%; padding: 13px; background: var(--primary); color: #fff; border: none;
+    border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer;
+    font-family: inherit; transition: background 0.15s;
+  }
+  .login-btn:hover { background: var(--primary-light); }
+
+  /* ===== TAB SYSTEM ===== */
+  .tabs { display: flex; gap: 4px; border-bottom: 2px solid var(--border); margin-bottom: 22px; }
+  .tab {
+    padding: 9px 18px; font-size: 13px; font-weight: 600; color: var(--muted);
+    cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px;
+    transition: all 0.15s; border-radius: 8px 8px 0 0;
+  }
+  .tab:hover { color: var(--primary); }
+  .tab.active { color: var(--primary); border-bottom-color: var(--primary); background: var(--primary-muted); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* ===== SECTION HEADING ===== */
+  .section-title {
+    font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--muted); margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+  }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* ===== MEMBER TOGGLE ROW ===== */
+  .member-row { display: flex; align-items: center; padding: 13px 0; border-bottom: 1px solid var(--border); gap: 12px; }
+  .member-row:last-child { border-bottom: none; }
+  .member-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #8b5cf6); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+  .member-info { flex: 1; }
+  .member-name { font-size: 13px; font-weight: 700; color: var(--text); }
+  .member-upasabha { font-size: 11px; color: var(--muted); }
+  .feature-toggles { display: flex; gap: 16px; flex-shrink: 0; }
+  .feature-toggle-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .feature-toggle-label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+
+  /* ===== PILLS ===== */
+  .pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .pill-blue { background: #dbeafe; color: #1d4ed8; }
+  .pill-green { background: var(--green-light); color: var(--green); }
+
+  /* ===== EXTENSION MODULES ===== */
+  .module-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media(max-width: 900px) { .module-grid-2 { grid-template-columns: 1fr; } }
+  .map-placeholder {
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    border: 1px solid #93c5fd;
+    border-radius: 10px;
+    min-height: 220px;
+    padding: 12px;
+  }
+  .map-dot {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #1e3a8a;
+    background: rgba(255,255,255,0.9);
+    border: 1px solid rgba(59,130,246,0.25);
+    border-radius: 999px;
+    padding: 4px 10px;
+    margin: 5px 6px 0 0;
+  }
+  .forum-post {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    background: #f8fafc;
+    margin-bottom: 10px;
+  }
+  .forum-reply {
+    margin-top: 8px;
+    margin-left: 16px;
+    padding: 8px 10px;
+    border-left: 3px solid #cbd5e1;
+    background: #fff;
+    border-radius: 6px;
+    font-size: 12px;
+  }
+
+</style>
+</head>
+<body>
+
+<!-- ========== LOGIN PAGE ========== -->
+<div id="login-page">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="login-logo">🏛️</div>
+      <div class="login-title">KBS Heritage Portal</div>
+      <div class="login-sub">Kula Bhandara Sabha – Community Management System</div>
+    </div>
+    <div class="login-body">
+      <p style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;">Quick Demo — Select Role</p>
+      <div class="login-roles">
+        <button class="login-role-btn selected" onclick="selectLoginRole(this,'global_admin','🌐 Global Admin')">🌐<br>Global Admin</button>
+        <button class="login-role-btn" onclick="selectLoginRole(this,'state_admin','🗺️ State Admin')">🗺️<br>State Admin</button>
+        <button class="login-role-btn" onclick="selectLoginRole(this,'district_admin','📍 District Admin')">📍<br>District Admin</button>
+        <button class="login-role-btn" onclick="selectLoginRole(this,'upasabha_admin','🏘️ Upasabha Admin')">🏘️<br>Upasabha Admin</button>
+        <button class="login-role-btn" onclick="selectLoginRole(this,'member','👤 Member')">👤<br>Member</button>
+      </div>
+      <input class="login-input" id="login-email" placeholder="Email" value="admin@kbs.org" />
+      <input class="login-input" type="password" placeholder="Password" value="••••••••" />
+      <button class="login-btn" onclick="doLogin()">Sign In to Portal</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== MAIN APP ========== -->
+<div class="app" id="main-app" style="display:none;">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">🏛️</div>
+      <div>
+        <div class="sidebar-logo-text">KBS Portal</div>
+        <div class="sidebar-logo-sub">Heritage Community System</div>
+      </div>
+    </div>
+
+    <div class="role-badge">
+      <div class="role-dot"></div>
+      <div class="role-name" id="sidebar-role-label">Global Admin</div>
+    </div>
+
+    <nav class="sidebar-nav" id="sidebar-nav">
+      <!-- Dynamically rendered by JS -->
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="avatar" id="sidebar-avatar">G</div>
+        <div>
+          <div class="user-name" id="sidebar-username">Rajan Murugan</div>
+          <div class="user-email" id="sidebar-useremail">admin@kbs.org</div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">⬅️ Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="topbar-breadcrumb" id="topbar-bc">🏠 Dashboard</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-icon-btn" title="Notifications">🔔<div class="notif-dot"></div></div>
+        <div class="topbar-icon-btn" title="Messages">✉️</div>
+        <div class="topbar-icon-btn" title="Settings">⚙️</div>
+        <div class="topbar-greeting">Welcome, <b id="topbar-name">Rajan</b></div>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- ROLE SWITCHER (Demo Tool) -->
+      <div class="role-switcher">
+        <span class="role-switcher-label">👁️ Preview Role:</span>
+        <button class="role-btn active" onclick="switchRole('global_admin',this)">🌐 Global Admin</button>
+        <button class="role-btn" onclick="switchRole('state_admin',this)">🗺️ State Admin</button>
+        <button class="role-btn" onclick="switchRole('district_admin',this)">📍 District Admin</button>
+        <button class="role-btn" onclick="switchRole('upasabha_admin',this)">🏘️ Upasabha Admin</button>
+        <button class="role-btn" onclick="switchRole('member',this)">👤 Member</button>
+      </div>
+
+      <!-- ===== DASHBOARD PAGE ===== -->
+      <div class="page active" id="page-dashboard">
+
+        <!-- Localized greeting card -->
+        <div class="localized-card" id="localized-banner">
+          <div class="localized-card-title" id="loc-title">🌐 Global Administration Dashboard</div>
+          <div class="localized-card-text" id="loc-text">You have full visibility across all states, districts, and upasabhas. Monitor activity, approve requests, and manage community-wide communications.</div>
+          <div class="localized-card-scope" id="loc-scope">SCOPE: All States • All Districts • All Upasabhas</div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid" id="stats-grid">
+          <!-- Rendered by JS -->
+        </div>
+
+        <!-- Main grid -->
+        <div class="grid-2" id="dash-grid">
+          <!-- Announcements -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📢 Latest Announcements</div>
+              <a class="read-more" onclick="gotoPage('communications')">View All →</a>
+            </div>
+            <div class="card-body" id="announcements-widget">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+          <!-- Events -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📅 Upcoming Events</div>
+              <a class="read-more" onclick="gotoPage('communications')">View All →</a>
+            </div>
+            <div class="card-body" id="events-widget">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Second row -->
+        <div class="grid-2" id="dash-grid2">
+          <!-- Alerts -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🔔 Important Alerts</div>
+            </div>
+            <div class="card-body" id="alerts-widget">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+          <!-- Community -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🌿 Community Updates</div>
+            </div>
+            <div class="card-body" id="community-widget">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /page-dashboard -->
+
+      <!-- ===== COMMUNICATIONS PAGE ===== -->
+      <div class="page" id="page-communications">
+        <div class="page-header page-header-row">
+          <div>
+            <h1>📣 Communications & Events</h1>
+            <p>Manage announcements, events, and community communications</p>
+          </div>
+          <button class="btn btn-primary" onclick="showCreateForm()">➕ Create New</button>
+        </div>
+
+        <div id="create-form-section" style="display:none;" class="card mb-6">
+          <div class="card-header">
+            <div class="card-title">✏️ Create Announcement / Event</div>
+            <button class="btn btn-ghost btn-sm" onclick="hideCreateForm()">✕ Cancel</button>
+          </div>
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Title *</label>
+                <input class="form-control" placeholder="Enter title..." />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Type</label>
+                <select class="form-control">
+                  <option>Announcement</option>
+                  <option>Event</option>
+                  <option>Alert</option>
+                  <option>Community Update</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Description *</label>
+              <textarea class="form-control" placeholder="Enter description..."></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Event Date</label>
+                <input type="date" class="form-control" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Event Location</label>
+                <input class="form-control" placeholder="City / Venue" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Target Audience</label>
+                <select class="form-control" id="target-audience">
+                  <option value="global">Global (All)</option>
+                  <option value="state">State Level</option>
+                  <option value="district">District Level</option>
+                  <option value="upasabha">Upasabha Level</option>
+                  <option value="members">Members Only</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Attachment (optional)</label>
+                <input type="file" class="form-control" />
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
+              <button class="btn btn-ghost btn-sm" onclick="hideCreateForm()">Cancel</button>
+              <button class="btn btn-primary btn-sm" onclick="saveAnnouncement()">💾 Save & Publish</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab(this,'tab-all')">All</div>
+          <div class="tab" onclick="switchTab(this,'tab-announcements')">Announcements</div>
+          <div class="tab" onclick="switchTab(this,'tab-events')">Events</div>
+          <div class="tab" onclick="switchTab(this,'tab-alerts')">Alerts</div>
+        </div>
+
+        <div class="tab-content active" id="tab-all">
+          <div class="card">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Target</th>
+                    <th>Created By</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="comms-table-body">
+                  <!-- JS rendered -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="tab-content" id="tab-announcements">
+          <div class="card" style="padding:20px;text-align:center;color:var(--muted);font-size:13px;">Showing announcements only. Use the All tab for full list.</div>
+        </div>
+        <div class="tab-content" id="tab-events">
+          <div class="card" style="padding:20px;text-align:center;color:var(--muted);font-size:13px;">Showing events only. Use the All tab for full list.</div>
+        </div>
+        <div class="tab-content" id="tab-alerts">
+          <div class="card" style="padding:20px;text-align:center;color:var(--muted);font-size:13px;">Showing alerts only. Use the All tab for full list.</div>
+        </div>
+      </div><!-- /page-communications -->
+
+      <!-- ===== MEMBER ACCESS PAGE ===== -->
+      <div class="page" id="page-member-access">
+        <div class="page-header">
+          <h1>🔐 Member Feature Access Control</h1>
+          <p>Enable or disable Matrimonial Iyal and Job Portal access per member</p>
+        </div>
+
+        <div class="alert-banner info mb-4">
+          <span class="alert-icon">ℹ️</span>
+          <div>When access is <b>enabled</b>, the feature appears in that member's left navigation menu. When disabled, it is hidden from their portal.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">👥 Member Access Configuration</div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:11px;font-weight:700;color:var(--muted);">LEGEND:</span>
+              <span class="pill pill-blue">💍 Matrimonial</span>
+              <span class="pill pill-green">💼 Job Portal</span>
+            </div>
+          </div>
+          <div class="card-body" id="member-access-list">
+            <!-- JS rendered -->
+          </div>
+          <div class="card-footer" style="text-align:right;">
+            <button class="btn btn-primary btn-sm" onclick="saveAccessSettings()">💾 Save Access Settings</button>
+          </div>
+        </div>
+      </div><!-- /page-member-access -->
+
+      <!-- ===== REGISTRATIONS PAGE ===== -->
+      <div class="page" id="page-registrations">
+        <div class="page-header page-header-row">
+          <div>
+            <h1>📋 Registration Management</h1>
+            <p>Review and manage member registrations</p>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-ghost btn-sm">⬇️ Export</button>
+            <button class="btn btn-outline btn-sm">🔍 Filter</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>State</th>
+                  <th>District</th>
+                  <th>Upasabha</th>
+                  <th>Submitted</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="reg-table-body">
+                <!-- JS rendered -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== FAMILY TREES PAGE ===== -->
+      <div class="page" id="page-family-trees">
+        <div class="page-header">
+          <h1>🌳 Family Tree Requests</h1>
+          <p>Review family tree linkage requests from members</p>
+        </div>
+        <div id="ft-approval-note" class="alert-banner info mb-4" style="display:none;">
+          <span class="alert-icon">ℹ️</span>
+          <div>District Admins can <b>view</b> family tree requests but <b>cannot approve</b> them. Approval is restricted to State Admin and Global Admin only.</div>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Requested By</th>
+                  <th>Relation</th>
+                  <th>District</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th id="ft-action-col">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="ft-table-body">
+                <!-- JS rendered -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== DISTRICT MANAGEMENT PAGE ===== -->
+      <div class="page" id="page-district">
+        <div class="page-header">
+          <h1>📍 District Management</h1>
+          <p>Manage district-level operations and members</p>
+        </div>
+
+        <div class="alert-banner info mb-4">
+          <span class="alert-icon">📍</span>
+          <div>You are viewing data for <b>Chennai District, Tamil Nadu</b>. All data is automatically scoped to your assigned district.</div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <div></div>
+              <div class="stat-card-icon teal">👥</div>
+            </div>
+            <div class="stat-card-label">District Members</div>
+            <div class="stat-card-value">287</div>
+            <div class="stat-card-trend">▲ +12 this month</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <div></div>
+              <div class="stat-card-icon amber">⏳</div>
+            </div>
+            <div class="stat-card-label">Pending Registrations</div>
+            <div class="stat-card-value">14</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <div></div>
+              <div class="stat-card-icon purple">🌳</div>
+            </div>
+            <div class="stat-card-label">FT Requests (View Only)</div>
+            <div class="stat-card-value">7</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-top">
+              <div></div>
+              <div class="stat-card-icon green">📅</div>
+            </div>
+            <div class="stat-card-label">Upcoming Events</div>
+            <div class="stat-card-value">3</div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header"><div class="card-title">🏘️ Upasabhas in District</div></div>
+            <div class="card-body">
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;border-radius:9px;background:#f8fafc;border:1px solid var(--border);">
+                  <div style="font-size:13px;font-weight:700;">Chennai North Upasabha</div>
+                  <span class="badge badge-approved">82 members</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;border-radius:9px;background:#f8fafc;border:1px solid var(--border);">
+                  <div style="font-size:13px;font-weight:700;">Chennai South Upasabha</div>
+                  <span class="badge badge-approved">105 members</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;border-radius:9px;background:#f8fafc;border:1px solid var(--border);">
+                  <div style="font-size:13px;font-weight:700;">T. Nagar Upasabha</div>
+                  <span class="badge badge-approved">100 members</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">📋 Recent Registrations</div></div>
+            <div class="card-body">
+              <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+                <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:8px;">
+                  <div class="avatar" style="width:32px;height:32px;font-size:12px;">A</div>
+                  <div><div style="font-weight:600;">Arun Selvam</div><div style="color:var(--muted);font-size:11px;">Chennai South • 2 days ago</div></div>
+                  <span class="badge badge-pending ml-auto">Pending</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:8px;">
+                  <div class="avatar" style="width:32px;height:32px;font-size:12px;">P</div>
+                  <div><div style="font-weight:600;">Priya Krishnan</div><div style="color:var(--muted);font-size:11px;">T. Nagar • 3 days ago</div></div>
+                  <span class="badge badge-pending ml-auto">Pending</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:8px;">
+                  <div class="avatar" style="width:32px;height:32px;font-size:12px;">V</div>
+                  <div><div style="font-weight:600;">Vijay Raman</div><div style="color:var(--muted);font-size:11px;">Chennai North • 5 days ago</div></div>
+                  <span class="badge badge-approved ml-auto">Approved</span>
+                </div>
+              </div>
+              <p style="font-size:11px;color:var(--amber);margin-top:12px;background:var(--amber-light);padding:8px 12px;border-radius:7px;">⚠️ Approval rights belong to State / Global Admin. You can view and monitor only.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== HIERARCHY PAGE ===== -->
+      <div class="page" id="page-hierarchy">
+        <div class="page-header">
+          <h1>🏗️ Role Hierarchy Structure</h1>
+          <p>Updated hierarchy including the new District Admin role</p>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header"><div class="card-title">📊 Updated Role Hierarchy</div></div>
+            <div class="card-body">
+              <div class="hierarchy-tree">
+                <div class="hier-node global">
+                  <div class="hier-node-icon">🌐</div>
+                  <div>
+                    <div class="hier-node-label">Global Admin</div>
+                    <div class="hier-node-sub">Full system access • Approves all requests</div>
+                  </div>
+                </div>
+                <div class="hier-connector"></div>
+                <div class="hier-node state hier-indent-1">
+                  <div class="hier-node-icon">🗺️</div>
+                  <div>
+                    <div class="hier-node-label">State Admin</div>
+                    <div class="hier-node-sub">State-level management • Can approve FT requests</div>
+                  </div>
+                </div>
+                <div class="hier-connector hier-indent-1" style="margin-left:55px;"></div>
+                <div class="hier-node district hier-indent-2">
+                  <div class="hier-node-icon">📍</div>
+                  <div>
+                    <div class="hier-node-label">District Admin</div>
+                    <div class="hier-node-sub">District-level management • View-only FT requests</div>
+                  </div>
+                  <span class="hier-new-badge">NEW</span>
+                </div>
+                <div class="hier-connector hier-indent-2" style="margin-left:75px;"></div>
+                <div class="hier-node upasabha hier-indent-3">
+                  <div class="hier-node-icon">🏘️</div>
+                  <div>
+                    <div class="hier-node-label">Upasabha Admin</div>
+                    <div class="hier-node-sub">Local sabha management</div>
+                  </div>
+                </div>
+                <div class="hier-connector hier-indent-3" style="margin-left:95px;"></div>
+                <div class="hier-node member hier-indent-4">
+                  <div class="hier-node-icon">👤</div>
+                  <div>
+                    <div class="hier-node-label">Member</div>
+                    <div class="hier-node-sub">Portal access • View own data</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="card-title">✅ Permission Matrix</div></div>
+            <div class="card-body" style="overflow-x:auto;">
+              <table class="perm-table" style="font-size:12px;">
+                <thead>
+                  <tr>
+                    <th style="text-align:left;">Permission</th>
+                    <th>Global</th>
+                    <th>State</th>
+                    <th>District<br><span style="font-size:9px;font-weight:600;color:var(--indigo);">NEW</span></th>
+                    <th>Upasabha</th>
+                    <th>Member</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>Global Oversight</td><td><span class="perm-check">✔</span></td><td><span class="perm-cross">—</span></td><td><span class="perm-cross">—</span></td><td><span class="perm-cross">—</span></td><td><span class="perm-cross">—</span></td></tr>
+                  <tr><td>View Registrations</td><td><span class="perm-check">✔</span></td><td><span class="perm-check">✔</span></td><td><span class="perm-check">✔</span></td><td><span class="perm-check">✔</span></td><td><span class="perm-cross">—</span></td></tr>
+                  <tr><td>Approve Registrations</td><td><span class="perm-check">✔</span></td><td><span class="perm-check">✔</span></td><td><span class="perm-cross">—</span></td><td><span class="perm-cross">—</span></td><td><span class="perm-cross">—</span></td></tr>
+                  <tr><td>View FT Requests</td><td><span class="perm-check">✔</span></td><td><span class="perm-check">✔</span></td><td><span class="perm-check">✔</span></td><td><span class="perm-check">✔</span></td><td><span class="perm-cross">—</span></td></tr>
+                  <tr><td>Approve FT Requests</td><td><span class="perm-check">✔</span></td><td><span class="perm-check">✔</span></td><td><span class="perm-cross">—</span></td><td><span class="perm-cross">—</span></td><td><span class="perm-cross">—</span></td></tr>
+                  <tr><td>Create Events/Comms</td><td><span class="perm-check">✔</span></td><td><span class="perm-check">✔</span></td><td><span class="perm-check">✔</span></td><td><span class="perm-check">✔</span></td><td><span class="perm-cross">—</span></td></tr>
+                  <tr><td>Member Access Control</td><td><span class="perm-check">✔</span></td><td><span class="perm-check">✔</span></td><td><span class="perm-cross">—</span></td><td><span class="perm-check">✔</span></td><td><span class="perm-cross">—</span></td></tr>
+                  <tr><td>Matrimonial Portal</td><td><span class="perm-cross">—</span></td><td><span class="perm-cross">—</span></td><td><span class="perm-cross">—</span></td><td><span class="perm-cross">—</span></td><td><span class="perm-partial">⚙️</span></td></tr>
+                  <tr><td>Job Portal</td><td><span class="perm-cross">—</span></td><td><span class="perm-cross">—</span></td><td><span class="perm-cross">—</span></td><td><span class="perm-cross">—</span></td><td><span class="perm-partial">⚙️</span></td></tr>
+                </tbody>
+              </table>
+              <p style="font-size:11px;color:var(--muted);margin-top:8px;">⚙️ = Admin-controlled per member access</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== MATRIMONIAL PAGE ===== -->
+      <div class="page" id="page-matrimonial">
+        <div class="coming-soon">
+          <div class="coming-soon-icon">💍</div>
+          <h2>Matrimonial Iyal</h2>
+          <p>This feature is currently under development. The navigation structure is ready — content will be available soon.</p>
+          <div class="coming-soon-badge">🚀 Coming Soon</div>
+        </div>
+      </div>
+
+      <!-- ===== JOB PORTAL PAGE ===== -->
+      <div class="page" id="page-job-portal">
+        <div class="coming-soon">
+          <div class="coming-soon-icon">💼</div>
+          <h2>Job Portal</h2>
+          <p>Career opportunities and job listings for community members are currently under development.</p>
+          <div class="coming-soon-badge">🚀 Coming Soon</div>
+        </div>
+      </div>
+
+      <!-- ===== GLOBAL OVERSIGHT PAGE ===== -->
+      <div class="page" id="page-global">
+        <div class="page-header"><h1>🌐 Global Oversight</h1><p>Overview of all states, districts, and upasabhas</p></div>
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-header"><div class="card-title">🗺️ Tamil Nadu</div></div>
+            <div class="card-body">
+              <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">3 Districts • 8 Upasabhas • 512 Members</div>
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <div style="padding:8px 12px;background:#f8fafc;border-radius:8px;font-size:12px;font-weight:600;display:flex;justify-content:space-between;"><span>📍 Chennai District</span><span class="badge badge-district">287 members</span></div>
+                <div style="padding:8px 12px;background:#f8fafc;border-radius:8px;font-size:12px;font-weight:600;display:flex;justify-content:space-between;"><span>📍 Coimbatore District</span><span class="badge badge-district">142 members</span></div>
+                <div style="padding:8px 12px;background:#f8fafc;border-radius:8px;font-size:12px;font-weight:600;display:flex;justify-content:space-between;"><span>📍 Madurai District</span><span class="badge badge-district">83 members</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">🗺️ Karnataka</div></div>
+            <div class="card-body">
+              <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">2 Districts • 4 Upasabhas • 312 Members</div>
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <div style="padding:8px 12px;background:#f8fafc;border-radius:8px;font-size:12px;font-weight:600;display:flex;justify-content:space-between;"><span>📍 Bangalore District</span><span class="badge badge-district">218 members</span></div>
+                <div style="padding:8px 12px;background:#f8fafc;border-radius:8px;font-size:12px;font-weight:600;display:flex;justify-content:space-between;"><span>📍 Mysore District</span><span class="badge badge-district">94 members</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">🗺️ Maharashtra</div></div>
+            <div class="card-body">
+              <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">2 Districts • 3 Upasabhas • 421 Members</div>
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <div style="padding:8px 12px;background:#f8fafc;border-radius:8px;font-size:12px;font-weight:600;display:flex;justify-content:space-between;"><span>📍 Mumbai District</span><span class="badge badge-district">298 members</span></div>
+                <div style="padding:8px 12px;background:#f8fafc;border-radius:8px;font-size:12px;font-weight:600;display:flex;justify-content:space-between;"><span>📍 Pune District</span><span class="badge badge-district">123 members</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== MEMBER PROFILE PAGE ===== -->
+      <div class="page" id="page-profile">
+        <div class="page-header"><h1>👤 My Profile</h1><p>View and manage your personal information</p></div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Personal Information</div></div>
+            <div class="card-body">
+              <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;padding:16px;background:var(--primary-muted);border-radius:10px;">
+                <div class="avatar" style="width:56px;height:56px;font-size:22px;">M</div>
+                <div>
+                  <div style="font-size:16px;font-weight:800;">Meena Suresh</div>
+                  <div style="font-size:12px;color:var(--muted);">member@kbs.org</div>
+                  <span class="badge badge-approved" style="margin-top:4px;">Active Member</span>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px;">
+                <div><span style="color:var(--muted);font-size:11px;font-weight:700;display:block;text-transform:uppercase;">Upasabha</span>T. Nagar Upasabha</div>
+                <div><span style="color:var(--muted);font-size:11px;font-weight:700;display:block;text-transform:uppercase;">State</span>Tamil Nadu</div>
+                <div><span style="color:var(--muted);font-size:11px;font-weight:700;display:block;text-transform:uppercase;">District</span>Chennai</div>
+                <div><span style="color:var(--muted);font-size:11px;font-weight:700;display:block;text-transform:uppercase;">Member Since</span>Jan 2024</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Feature Access</div></div>
+            <div class="card-body">
+              <p style="font-size:12px;color:var(--muted);margin-bottom:14px;">Feature access is controlled by your admin. Contact your Upasabha Admin to request access.</p>
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:#f8fafc;border-radius:9px;border:1px solid var(--border);">
+                  <div style="display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;"><span>💍</span> Matrimonial Iyal</div>
+                  <span class="badge badge-enabled" id="member-mat-status">Enabled</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:#f8fafc;border-radius:9px;border:1px solid var(--border);">
+                  <div style="display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;"><span>💼</span> Job Portal</div>
+                  <span class="badge badge-disabled" id="member-job-status">Disabled</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== INTERNATIONAL PROFILE PAGE ===== -->
+      <div class="page" id="page-international">
+        <div class="page-header">
+          <h1>🌍 International User Identification</h1>
+          <p>Capture overseas details and link them to user profile</p>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">Are you staying outside India?</label>
+              <select id="intl-outside" class="form-control" onchange="toggleInternationalFields(this.value)">
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+            <div id="intl-extra-fields" style="display:none;">
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Country *</label><input id="intl-country" class="form-control" placeholder="Country" /></div>
+                <div class="form-group"><label class="form-label">City *</label><input id="intl-city" class="form-control" placeholder="City" /></div>
+              </div>
+              <div class="form-group"><label class="form-label">Full Address *</label><textarea id="intl-address" class="form-control" placeholder="Full address"></textarea></div>
+              <div class="form-group"><label class="form-label">Contact Details *</label><input id="intl-contact" class="form-control" placeholder="Phone / email" /></div>
+            </div>
+            <button class="btn btn-primary" onclick="saveInternationalProfile()">💾 Save International Details</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== NEARBY MEMBERS PAGE ===== -->
+      <div class="page" id="page-nearby-members">
+        <div class="page-header page-header-row">
+          <div>
+            <h1>📍 Nearby Members Discovery</h1>
+            <p>Find members by current geo-location or manual location selection</p>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-outline btn-sm" onclick="switchNearbyView('list')">☰ List</button>
+            <button class="btn btn-outline btn-sm" onclick="switchNearbyView('map')">🗺️ Map</button>
+          </div>
+        </div>
+        <div class="card mb-6">
+          <div class="card-body module-grid-2">
+            <div>
+              <label class="form-label">Current geo-location</label>
+              <button class="btn btn-primary btn-sm" onclick="findNearbyByCurrentLocation()">📡 Use My Location</button>
+            </div>
+            <div>
+              <label class="form-label">Manual location search</label>
+              <div style="display:flex;gap:8px;">
+                <input id="nearby-location-input" class="form-control" placeholder="City / location" />
+                <button class="btn btn-outline btn-sm" onclick="findNearbyByManualLocation()">Search</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="nearby-list-wrap" class="card">
+          <div class="card-header"><div class="card-title">👥 Member Results (List View)</div></div>
+          <div class="card-body" id="nearby-list"></div>
+        </div>
+        <div id="nearby-map-wrap" class="card" style="display:none;">
+          <div class="card-header"><div class="card-title">🗺️ Member Results (Map View)</div></div>
+          <div class="card-body"><div id="nearby-map" class="map-placeholder"></div></div>
+        </div>
+      </div>
+
+      <!-- ===== BUSINESS NETWORK PAGE ===== -->
+      <div class="page" id="page-business-network">
+        <div class="page-header">
+          <h1>🏢 Business Network</h1>
+          <p>Apply for business listing, review pending requests, and browse approved directory</p>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header"><div class="card-title">📝 Business Listing Application</div></div>
+            <div class="card-body">
+              <div class="form-group"><label class="form-label">Business Name *</label><input id="biz-name" class="form-control" placeholder="Business name" /></div>
+              <div class="form-group"><label class="form-label">Category *</label><input id="biz-category" class="form-control" placeholder="Category" /></div>
+              <div class="form-group"><label class="form-label">Description *</label><textarea id="biz-description" class="form-control" placeholder="Description"></textarea></div>
+              <div class="form-group"><label class="form-label">Contact Info *</label><input id="biz-contact" class="form-control" placeholder="Phone / email" /></div>
+              <div class="form-group"><label class="form-label">Location *</label><input id="biz-location" class="form-control" placeholder="Location" /></div>
+              <button class="btn btn-primary" onclick="submitBusinessApplication()">➕ Submit for Approval</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">📂 Approved Business Directory</div></div>
+            <div class="card-body" id="business-directory-list"></div>
+          </div>
+        </div>
+        <div class="card" id="business-admin-review-wrap" style="display:none;">
+          <div class="card-header"><div class="card-title">✅ Admin Approval Queue</div></div>
+          <div class="card-body" id="business-review-list"></div>
+        </div>
+      </div>
+
+      <!-- ===== STUDENT FORUM PAGE ===== -->
+      <div class="page" id="page-student-forum">
+        <div class="page-header">
+          <h1>🎓 Student Interaction Forum</h1>
+          <p>Post queries, share information, and respond in a simple discussion space</p>
+        </div>
+        <div class="card mb-6">
+          <div class="card-body">
+            <div class="form-group"><label class="form-label">Create Post</label><textarea id="forum-new-post" class="form-control" placeholder="Write your message"></textarea></div>
+            <button class="btn btn-primary" onclick="addForumPost()">📨 Publish Post</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">💬 Discussion Feed</div></div>
+          <div class="card-body" id="forum-posts-list"></div>
+        </div>
+      </div>
+
+      <!-- ===== PROMOTION CODES PAGE ===== -->
+      <div class="page" id="page-promotions">
+        <div class="page-header">
+          <h1>🎁 Promotion Code System</h1>
+          <p>Create targeted promo codes (admin) and display only valid promos for matching users</p>
+        </div>
+        <div class="grid-2">
+          <div class="card" id="promo-admin-create-wrap" style="display:none;">
+            <div class="card-header"><div class="card-title">🛠️ Create Promo Code (Admin)</div></div>
+            <div class="card-body">
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Code *</label><input id="promo-code" class="form-control" placeholder="KBS2026" /></div>
+                <div class="form-group"><label class="form-label">Validity *</label><input id="promo-validity" type="date" class="form-control" /></div>
+              </div>
+              <div class="form-group"><label class="form-label">Discount/Offer Details *</label><textarea id="promo-offer" class="form-control" placeholder="Offer details"></textarea></div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Target Type *</label>
+                  <select id="promo-target-type" class="form-control">
+                    <option value="user">Specific user</option>
+                    <option value="location">Location</option>
+                    <option value="category">Category</option>
+                  </select>
+                </div>
+                <div class="form-group"><label class="form-label">Target Value *</label><input id="promo-target-value" class="form-control" placeholder="User / city / role" /></div>
+              </div>
+              <button class="btn btn-primary" onclick="createPromoCode()">➕ Create Promo Code</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">🎯 Visible Promo Codes</div></div>
+            <div class="card-body" id="promo-visible-list"></div>
+            <div class="card-footer">
+              <div style="display:flex;gap:8px;">
+                <input id="promo-apply-input" class="form-control" placeholder="Enter code to validate" />
+                <button class="btn btn-outline btn-sm" onclick="applyPromoCode()">Apply</button>
+              </div>
+              <div id="promo-apply-msg" style="margin-top:8px;font-size:12px;color:var(--muted);"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+
+</div><!-- /app -->
+
+<script>
+// ===== DATA =====
+const ROLES = { GLOBAL_ADMIN: 'global_admin', STATE_ADMIN: 'state_admin', DISTRICT_ADMIN: 'district_admin', UPASABHA_ADMIN: 'upasabha_admin', MEMBER: 'member' };
+
+const USERS = {
+  global_admin: { name: 'Rajan Murugan', email: 'admin@kbs.org', role: ROLES.GLOBAL_ADMIN, scope: 'All States' },
+  state_admin: { name: 'Kavitha Sundaram', email: 'state@kbs.org', role: ROLES.STATE_ADMIN, scope: 'Tamil Nadu' },
+  district_admin: { name: 'Senthil Kumar', email: 'district@kbs.org', role: ROLES.DISTRICT_ADMIN, scope: 'Chennai District, TN' },
+  upasabha_admin: { name: 'Anbu Rajan', email: 'upasabha@kbs.org', role: ROLES.UPASABHA_ADMIN, scope: 'T. Nagar Upasabha' },
+  member: { name: 'Meena Suresh', email: 'member@kbs.org', role: ROLES.MEMBER, scope: 'T. Nagar, Chennai', matrimonial: true, jobPortal: false }
+};
+
+const ANNOUNCEMENTS = [
+  { title: 'Annual Kula Sabha 2025 – Date Announced', type: 'global', desc: 'The Annual Kula Sabha will be held on 15th June 2025 at Chennai. All members are requested to register.', by: 'Global Admin', date: '3 Apr 2025', target: 'global' },
+  { title: 'Tamil Nadu State Meet – Registration Open', type: 'state', desc: 'State-level community gathering for all Tamil Nadu members. Food and accommodation provided.', by: 'State Admin', date: '5 Apr 2025', target: 'state' },
+  { title: 'Chennai District Cultural Program', type: 'event', desc: 'A cultural evening featuring traditional music and dance. Open to all district members.', by: 'District Admin', date: '7 Apr 2025', target: 'district' },
+  { title: 'T. Nagar Upasabha Monthly Meeting', type: 'upasabha', desc: 'Monthly meeting at the community hall. Attendance is mandatory for active members.', by: 'Upasabha Admin', date: '8 Apr 2025', target: 'upasabha' },
+  { title: '⚠️ Data Verification Required', type: 'alert', desc: 'All members must verify their contact details before April 30 to avoid account suspension.', by: 'Global Admin', date: '9 Apr 2025', target: 'global' },
+];
+
+const EVENTS = [
+  { day: '15', month: 'Jun', title: 'Annual Kula Sabha 2025', loc: 'Chennai Convention Centre', tag: 'Global' },
+  { day: '22', month: 'Apr', title: 'Cultural Evening – Chennai District', loc: 'T. Nagar Community Hall', tag: 'District' },
+  { day: '28', month: 'Apr', title: 'T. Nagar Monthly Meeting', loc: 'Upasabha Office', tag: 'Upasabha' },
+  { day: '10', month: 'May', title: 'Youth Leadership Workshop', loc: 'Coimbatore Sabha Hall', tag: 'State' },
+];
+
+const REGISTRATIONS = [
+  { name: 'Arun Selvam', state: 'Tamil Nadu', district: 'Chennai', upasabha: 'Chennai South', date: '08 Apr 2025', status: 'pending' },
+  { name: 'Priya Krishnan', state: 'Tamil Nadu', district: 'Chennai', upasabha: 'T. Nagar', date: '07 Apr 2025', status: 'pending' },
+  { name: 'Vijay Raman', state: 'Tamil Nadu', district: 'Chennai', upasabha: 'Chennai North', date: '05 Apr 2025', status: 'approved' },
+  { name: 'Sunitha Babu', state: 'Karnataka', district: 'Bangalore', upasabha: 'MG Road Sabha', date: '04 Apr 2025', status: 'approved' },
+  { name: 'Karthik Nair', state: 'Maharashtra', district: 'Mumbai', upasabha: 'Andheri Sabha', date: '02 Apr 2025', status: 'rejected' },
+];
+
+const FAMILY_TREES = [
+  { name: 'Meena Suresh', relation: 'Add Spouse – Suresh Menon', district: 'Chennai', date: '08 Apr 2025', status: 'pending' },
+  { name: 'Arun Selvam', relation: 'Add Parent – Selvam Pillai', district: 'Chennai', date: '06 Apr 2025', status: 'pending' },
+  { name: 'Kavitha Iyer', relation: 'Add Sibling – Ravi Iyer', district: 'Coimbatore', date: '03 Apr 2025', status: 'approved' },
+  { name: 'Raj Murugan', relation: 'Add Child – Priya Murugan', district: 'Bangalore', date: '01 Apr 2025', status: 'approved' },
+];
+
+const MEMBERS_ACCESS = [
+  { name: 'Meena Suresh', upasabha: 'T. Nagar Upasabha', matrimonial: true, jobPortal: false },
+  { name: 'Arun Selvam', upasabha: 'Chennai South', matrimonial: false, jobPortal: true },
+  { name: 'Priya Krishnan', upasabha: 'T. Nagar Upasabha', matrimonial: true, jobPortal: true },
+  { name: 'Kavitha Iyer', upasabha: 'Coimbatore Sabha', matrimonial: false, jobPortal: false },
+  { name: 'Vijay Raman', upasabha: 'Chennai North', matrimonial: true, jobPortal: false },
+];
+
+const MEMBER_GEO_DIRECTORY = [
+  { id: 'm1', name: 'Meena Suresh', location: 'Chennai', country: 'India', profile: 'Student volunteer and youth coordinator', lat: 13.0827, lng: 80.2707, category: 'member' },
+  { id: 'm2', name: 'Arun Selvam', location: 'Chennai', country: 'India', profile: 'Community event contributor', lat: 13.0674, lng: 80.2376, category: 'member' },
+  { id: 'm3', name: 'Priya Krishnan', location: 'Bangalore', country: 'India', profile: 'Student mentor for academic programs', lat: 12.9716, lng: 77.5946, category: 'student' },
+  { id: 'm4', name: 'Kavitha Iyer', location: 'Coimbatore', country: 'India', profile: 'State-level communications lead', lat: 11.0168, lng: 76.9558, category: 'admin' },
+  { id: 'm5', name: 'Ravi Menon', location: 'Dubai', country: 'UAE', profile: 'Overseas chapter volunteer', lat: 25.2048, lng: 55.2708, category: 'member' }
+];
+
+const FORUM_POSTS = [
+  { id: 'f1', user: 'Priya Krishnan', role: 'member', text: 'Can anyone share scholarship application guidance?', createdAt: '11 Apr 2025', comments: [{ user: 'Meena Suresh', text: 'I can share the last year checklist.' }] }
+];
+
+const BUSINESS_APPLICATIONS = [];
+const PROMO_CODES = [];
+const INTERNATIONAL_PROFILES = {};
+let nearbyResults = MEMBER_GEO_DIRECTORY.slice(0, 4);
+let nearbyView = 'list';
+
+let currentRole = 'global_admin';
+let selectedLoginRole = 'global_admin';
+
+// ===== ROLE CONFIGS =====
+const ROLE_CONFIGS = {
+  global_admin: {
+    label: 'Global Admin',
+    nav: [
+      { icon: '🏠', label: 'Dashboard', page: 'dashboard' },
+      { icon: '🌐', label: 'Global Oversight', page: 'global', section: 'Administration' },
+      { icon: '📋', label: 'All Registrations', page: 'registrations' },
+      { icon: '🌳', label: 'Family Tree Requests', page: 'family-trees' },
+      { icon: '📣', label: 'Communications', page: 'communications', badge: '2' },
+      { icon: '🔐', label: 'Member Access', page: 'member-access', section: 'Member Management' },
+      { icon: '🌍', label: 'International ID', page: 'international' },
+      { icon: '📍', label: 'Nearby Members', page: 'nearby-members' },
+      { icon: '🏢', label: 'Business Network', page: 'business-network' },
+      { icon: '🎓', label: 'Student Forum', page: 'student-forum' },
+      { icon: '🎁', label: 'Promotion Codes', page: 'promotions' },
+      { icon: '🏗️', label: 'Role Hierarchy', page: 'hierarchy', section: 'System' },
+    ],
+    stats: [
+      { label: 'Total States', val: '4', icon: '🗺️', color: 'blue', trend: '+1 this year' },
+      { label: 'Total Districts', val: '11', icon: '📍', color: 'indigo', trend: 'NEW role added' },
+      { label: 'Total Members', val: '1,245', icon: '👥', color: 'green', trend: '+89 this month' },
+      { label: 'Pending Approvals', val: '16', icon: '⏳', color: 'amber' },
+    ],
+    locTitle: '🌐 Global Administration Dashboard',
+    locText: 'You have full visibility across all states, districts, and upasabhas. Monitor activity, approve requests, and manage community-wide communications.',
+    locScope: 'SCOPE: All States • All Districts • All Upasabhas',
+    annFilter: () => ANNOUNCEMENTS,
+  },
+  state_admin: {
+    label: 'State Admin',
+    nav: [
+      { icon: '🏠', label: 'Dashboard', page: 'dashboard' },
+      { icon: '📋', label: 'Registrations', page: 'registrations', section: 'Management' },
+      { icon: '🌳', label: 'Family Tree Requests', page: 'family-trees' },
+      { icon: '📣', label: 'Communications', page: 'communications', badge: '1' },
+      { icon: '🔐', label: 'Member Access', page: 'member-access', section: 'Member Management' },
+      { icon: '🌍', label: 'International ID', page: 'international' },
+      { icon: '📍', label: 'Nearby Members', page: 'nearby-members' },
+      { icon: '🏢', label: 'Business Network', page: 'business-network' },
+      { icon: '🎓', label: 'Student Forum', page: 'student-forum' },
+      { icon: '🎁', label: 'Promotion Codes', page: 'promotions' },
+    ],
+    stats: [
+      { label: 'State Members', val: '512', icon: '👥', color: 'blue' },
+      { label: 'Pending Registrations', val: '8', icon: '⏳', color: 'amber' },
+      { label: 'Districts', val: '3', icon: '📍', color: 'teal' },
+      { label: 'FT Requests Pending', val: '4', icon: '🌳', color: 'purple' },
+    ],
+    locTitle: '🗺️ Tamil Nadu State Dashboard',
+    locText: 'You are managing all activities within Tamil Nadu state including Chennai, Coimbatore, and Madurai districts.',
+    locScope: 'SCOPE: Tamil Nadu State • All Districts',
+    annFilter: () => ANNOUNCEMENTS.filter(a => ['global','state','alert'].includes(a.type)),
+  },
+  district_admin: {
+    label: 'District Admin',
+    nav: [
+      { icon: '🏠', label: 'Dashboard', page: 'dashboard' },
+      { icon: '📍', label: 'District Overview', page: 'district', section: 'District Management' },
+      { icon: '📋', label: 'Registrations', page: 'registrations' },
+      { icon: '🌳', label: 'Family Trees (View)', page: 'family-trees' },
+      { icon: '📣', label: 'Communications', page: 'communications' },
+      { icon: '🌍', label: 'International ID', page: 'international' },
+      { icon: '📍', label: 'Nearby Members', page: 'nearby-members' },
+      { icon: '🏢', label: 'Business Network', page: 'business-network' },
+      { icon: '🎓', label: 'Student Forum', page: 'student-forum' },
+      { icon: '🎁', label: 'Promotion Codes', page: 'promotions' },
+    ],
+    stats: [
+      { label: 'District Members', val: '287', icon: '👥', color: 'teal' },
+      { label: 'Pending Registrations', val: '14', icon: '⏳', color: 'amber' },
+      { label: 'FT Requests (View)', val: '7', icon: '🌳', color: 'purple' },
+      { label: 'Upcoming Events', val: '3', icon: '📅', color: 'green' },
+    ],
+    locTitle: '📍 Chennai District Dashboard',
+    locText: 'You are managing Chennai District within Tamil Nadu. Data is automatically scoped to your assigned district.',
+    locScope: 'SCOPE: Chennai District • Tamil Nadu State',
+    annFilter: () => ANNOUNCEMENTS.filter(a => ['global','state','district','alert'].includes(a.type)),
+  },
+  upasabha_admin: {
+    label: 'Upasabha Admin',
+    nav: [
+      { icon: '🏠', label: 'Dashboard', page: 'dashboard' },
+      { icon: '📋', label: 'Registrations', page: 'registrations', section: 'Management' },
+      { icon: '🌳', label: 'Family Trees', page: 'family-trees' },
+      { icon: '📣', label: 'Communications', page: 'communications' },
+      { icon: '🔐', label: 'Member Access', page: 'member-access', section: 'Member Management' },
+      { icon: '🌍', label: 'International ID', page: 'international' },
+      { icon: '📍', label: 'Nearby Members', page: 'nearby-members' },
+      { icon: '🏢', label: 'Business Network', page: 'business-network' },
+      { icon: '🎓', label: 'Student Forum', page: 'student-forum' },
+      { icon: '🎁', label: 'Promotion Codes', page: 'promotions' },
+    ],
+    stats: [
+      { label: 'Upasabha Members', val: '100', icon: '👥', color: 'blue' },
+      { label: 'Pending Registrations', val: '3', icon: '⏳', color: 'amber' },
+      { label: 'Family Trees', val: '89', icon: '🌳', color: 'green' },
+      { label: 'Active Events', val: '1', icon: '📅', color: 'teal' },
+    ],
+    locTitle: '🏘️ T. Nagar Upasabha Dashboard',
+    locText: 'You are managing T. Nagar Upasabha within Chennai District. View and manage local member activity.',
+    locScope: 'SCOPE: T. Nagar Upasabha • Chennai District',
+    annFilter: () => ANNOUNCEMENTS.filter(a => ['global','state','district','upasabha','alert'].includes(a.type)),
+  },
+  member: {
+    label: 'Member',
+    nav: [
+      { icon: '🏠', label: 'Dashboard', page: 'dashboard' },
+      { icon: '👤', label: 'My Profile', page: 'profile', section: 'My Account' },
+      { icon: '🌍', label: 'International ID', page: 'international' },
+      { icon: '📍', label: 'Nearby Members', page: 'nearby-members' },
+      { icon: '🏢', label: 'Business Network', page: 'business-network' },
+      { icon: '🎓', label: 'Student Forum', page: 'student-forum' },
+      { icon: '🎁', label: 'Promotion Codes', page: 'promotions' },
+      { icon: '🌳', label: 'Family Tree', page: 'family-trees' },
+      { icon: '💍', label: 'Matrimonial Iyal', page: 'matrimonial', section: 'Features' },
+      // Job Portal NOT shown (disabled for this member)
+    ],
+    stats: [
+      { label: 'Profile Status', val: 'Active', icon: '✅', color: 'green' },
+      { label: 'Family Members', val: '6', icon: '👨‍👩‍👧‍👦', color: 'blue' },
+      { label: 'FT Requests', val: '1', icon: '🌳', color: 'teal' },
+      { label: 'Account Age', val: '90 days', icon: '📅', color: 'amber' },
+    ],
+    locTitle: '👤 Welcome, Meena!',
+    locText: 'Here is your personalized dashboard with updates relevant to T. Nagar Upasabha and Chennai District.',
+    locScope: 'SCOPE: T. Nagar Upasabha • Chennai District • Member View',
+    annFilter: () => ANNOUNCEMENTS.filter(a => ['global','state','upasabha','alert'].includes(a.type)),
+  }
+};
+
+// ===== RENDER FUNCTIONS =====
+function renderSidebar(role) {
+  const cfg = ROLE_CONFIGS[role];
+  const nav = document.getElementById('sidebar-nav');
+  let html = '';
+  let lastSection = null;
+  cfg.nav.forEach(item => {
+    if (item.section && item.section !== lastSection) {
+      html += `<div class="nav-section-label">${item.section}</div>`;
+      lastSection = item.section;
+    }
+    const active = (item.page === 'dashboard') ? 'active' : '';
+    const badge = item.badge ? `<span class="badge-count">${item.badge}</span>` : '';
+    html += `<a class="nav-item ${active}" onclick="gotoPage('${item.page}')" data-page="${item.page}">
+      <span class="nav-icon">${item.icon}</span> ${item.label} ${badge}
+    </a>`;
+  });
+  nav.innerHTML = html;
+  document.getElementById('sidebar-role-label').textContent = cfg.label;
+}
+
+function renderStats(role) {
+  const cfg = ROLE_CONFIGS[role];
+  const grid = document.getElementById('stats-grid');
+  grid.innerHTML = cfg.stats.map(s => `
+    <div class="stat-card">
+      <div class="stat-card-top">
+        <div></div>
+        <div class="stat-card-icon ${s.color}">${s.icon}</div>
+      </div>
+      <div class="stat-card-label">${s.label}</div>
+      <div class="stat-card-value">${s.val}</div>
+      ${s.trend ? `<div class="stat-card-trend">▲ ${s.trend}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+function renderAnnouncements(role) {
+  const cfg = ROLE_CONFIGS[role];
+  const items = cfg.annFilter();
+  const el = document.getElementById('announcements-widget');
+  el.innerHTML = items.slice(0,3).map(a => `
+    <div class="announcement-item">
+      <div class="ann-icon ${a.type}">${a.type==='alert'?'⚠️':a.type==='global'?'🌐':a.type==='state'?'🗺️':a.type==='event'?'📅':'🏘️'}</div>
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <span class="ann-badge ${a.type}">${a.target.toUpperCase()}</span>
+        </div>
+        <div class="ann-title">${a.title}</div>
+        <div class="ann-desc">${a.desc.substring(0,80)}...</div>
+        <div class="ann-meta">
+          <span>By ${a.by}</span> • <span>${a.date}</span>
+          <a class="read-more">Read More →</a>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderEvents() {
+  const el = document.getElementById('events-widget');
+  el.innerHTML = EVENTS.map(e => `
+    <div class="event-item">
+      <div class="event-date-box">
+        <div class="event-day">${e.day}</div>
+        <div class="event-month">${e.month}</div>
+      </div>
+      <div>
+        <div class="event-title">${e.title}</div>
+        <div class="event-loc">📍 ${e.loc}</div>
+        <div class="event-tag">${e.tag}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderAlerts(role) {
+  const el = document.getElementById('alerts-widget');
+  const alerts = [
+    { type:'warning', msg: role==='district_admin' ? '14 pending registrations awaiting State Admin approval in your district.' : '16 items require your attention across the system.' },
+    { type:'info', msg: role==='district_admin' ? 'You can view Family Tree requests but approval requires State/Global Admin.' : 'New District Admin role has been added to the hierarchy.' },
+    { type:'success', msg: 'Annual Kula Sabha 2025 registration is now open.' },
+  ];
+  el.innerHTML = alerts.map(a => `
+    <div class="alert-banner ${a.type}" style="margin-bottom:8px;">
+      <span class="alert-icon">${a.type==='warning'?'⚠️':a.type==='info'?'ℹ️':'✅'}</span>
+      <div style="font-size:12px;">${a.msg}</div>
+    </div>
+  `).join('');
+}
+
+function renderCommunity() {
+  const el = document.getElementById('community-widget');
+  el.innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+      <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:8px;">
+        <div style="font-size:18px;">🎉</div>
+        <div><div style="font-weight:600;">Vikram Patel approved</div><div style="color:var(--muted);font-size:11px;">Joined Chennai District • 1 day ago</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:8px;">
+        <div style="font-size:18px;">🌳</div>
+        <div><div style="font-weight:600;">Family tree request by Meena Suresh</div><div style="color:var(--muted);font-size:11px;">T. Nagar Upasabha • 2 days ago</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:8px;">
+        <div style="font-size:18px;">📍</div>
+        <div><div style="font-weight:600;">District Admin role assigned to Senthil Kumar</div><div style="color:var(--muted);font-size:11px;">Chennai District • 3 days ago</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8fafc;border-radius:8px;">
+        <div style="font-size:18px;">📋</div>
+        <div><div style="font-weight:600;">3 new registrations this week</div><div style="color:var(--muted);font-size:11px;">All districts • 4 days ago</div></div>
+      </div>
+    </div>
+  `;
+}
+
+function renderCommsTable() {
+  const el = document.getElementById('comms-table-body');
+  el.innerHTML = ANNOUNCEMENTS.map(a => `
+    <tr>
+      <td style="font-weight:600;">${a.title}</td>
+      <td><span class="ann-badge ${a.type}">${a.type.charAt(0).toUpperCase()+a.type.slice(1)}</span></td>
+      <td><span class="badge badge-${a.target==='global'?'global':a.target==='state'?'state':a.target==='upasabha'?'upasabha':'district'}">${a.target.charAt(0).toUpperCase()+a.target.slice(1)}</span></td>
+      <td style="color:var(--muted);font-size:12px;">${a.by}</td>
+      <td style="color:var(--muted);font-size:12px;">${a.date}</td>
+      <td>
+        <button class="btn btn-ghost btn-sm" style="font-size:11px;">✏️ Edit</button>
+        <button class="btn btn-ghost btn-sm" style="font-size:11px;color:var(--red);">🗑️</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderRegsTable() {
+  const el = document.getElementById('reg-table-body');
+  el.innerHTML = REGISTRATIONS.map(r => `
+    <tr>
+      <td style="font-weight:600;">${r.name}</td>
+      <td style="font-size:12px;">${r.state}</td>
+      <td style="font-size:12px;">${r.district}</td>
+      <td style="font-size:12px;">${r.upasabha}</td>
+      <td style="color:var(--muted);font-size:12px;">${r.date}</td>
+      <td><span class="badge badge-${r.status}">${r.status.charAt(0).toUpperCase()+r.status.slice(1)}</span></td>
+      <td>
+        ${r.status==='pending' && currentRole !== 'district_admin'
+          ? `<button class="btn btn-success btn-sm" style="font-size:11px;" onclick="approveReg(this)">✔ Approve</button>
+             <button class="btn btn-danger btn-sm" style="font-size:11px;margin-left:4px;">✕ Reject</button>`
+          : r.status==='pending' && currentRole === 'district_admin'
+          ? `<span style="font-size:11px;color:var(--amber);">⏳ Awaiting State Admin</span>`
+          : `<span style="font-size:11px;color:var(--muted);">—</span>`
+        }
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderFamilyTrees() {
+  const isDistrictAdmin = currentRole === 'district_admin';
+  const canApprove = ['global_admin','state_admin'].includes(currentRole);
+  
+  const noteEl = document.getElementById('ft-approval-note');
+  noteEl.style.display = isDistrictAdmin ? 'flex' : 'none';
+  
+  document.getElementById('ft-action-col').textContent = canApprove ? 'Actions' : (isDistrictAdmin ? 'Note' : 'Status');
+  
+  const el = document.getElementById('ft-table-body');
+  el.innerHTML = FAMILY_TREES.map(f => `
+    <tr>
+      <td style="font-weight:600;">${f.name}</td>
+      <td style="font-size:12px;">${f.relation}</td>
+      <td style="font-size:12px;">${f.district}</td>
+      <td style="color:var(--muted);font-size:12px;">${f.date}</td>
+      <td><span class="badge badge-${f.status}">${f.status.charAt(0).toUpperCase()+f.status.slice(1)}</span></td>
+      <td>
+        ${canApprove && f.status==='pending'
+          ? `<button class="btn btn-success btn-sm" style="font-size:11px;">✔ Approve</button>
+             <button class="btn btn-danger btn-sm" style="font-size:11px;margin-left:4px;">✕ Reject</button>`
+          : isDistrictAdmin && f.status==='pending'
+          ? `<span style="font-size:11px;color:var(--amber);">View only</span>`
+          : `<span style="font-size:11px;color:var(--muted);">—</span>`
+        }
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderMemberAccess() {
+  const el = document.getElementById('member-access-list');
+  el.innerHTML = MEMBERS_ACCESS.map((m, i) => `
+    <div class="member-row">
+      <div class="member-avatar">${m.name.charAt(0)}</div>
+      <div class="member-info">
+        <div class="member-name">${m.name}</div>
+        <div class="member-upasabha">${m.upasabha}</div>
+      </div>
+      <div class="feature-toggles">
+        <div class="feature-toggle-item">
+          <div class="feature-toggle-label">💍 Matrimonial</div>
+          <label class="toggle">
+            <input type="checkbox" ${m.matrimonial ? 'checked' : ''} onchange="toggleFeature(${i},'matrimonial',this.checked)">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+        <div class="feature-toggle-item">
+          <div class="feature-toggle-label">💼 Job Portal</div>
+          <label class="toggle">
+            <input type="checkbox" ${m.jobPortal ? 'checked' : ''} onchange="toggleFeature(${i},'jobPortal',this.checked)">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderLocalized(role) {
+  const cfg = ROLE_CONFIGS[role];
+  document.getElementById('loc-title').textContent = cfg.locTitle;
+  document.getElementById('loc-text').textContent = cfg.locText;
+  document.getElementById('loc-scope').textContent = cfg.locScope;
+}
+
+function renderUserInfo(role) {
+  const user = USERS[role];
+  document.getElementById('sidebar-username').textContent = user.name;
+  document.getElementById('sidebar-useremail').textContent = user.email;
+  document.getElementById('sidebar-avatar').textContent = user.name.charAt(0);
+  document.getElementById('topbar-name').textContent = user.name.split(' ')[0];
+}
+
+function getCurrentUserKey() {
+  const user = USERS[currentRole];
+  return `${user.role}:${user.email}`;
+}
+
+function toggleInternationalFields(value) {
+  document.getElementById('intl-extra-fields').style.display = value === 'yes' ? 'block' : 'none';
+}
+
+function saveInternationalProfile() {
+  const outsideIndia = document.getElementById('intl-outside').value;
+  const key = getCurrentUserKey();
+  if (outsideIndia === 'yes') {
+    const country = document.getElementById('intl-country').value.trim();
+    const city = document.getElementById('intl-city').value.trim();
+    const address = document.getElementById('intl-address').value.trim();
+    const contact = document.getElementById('intl-contact').value.trim();
+    if (!country || !city || !address || !contact) {
+      alert('Please complete all international fields.');
+      return;
+    }
+    INTERNATIONAL_PROFILES[key] = { outsideIndia, country, city, address, contact, updatedAt: new Date().toISOString() };
+  } else {
+    INTERNATIONAL_PROFILES[key] = { outsideIndia, updatedAt: new Date().toISOString() };
+  }
+  alert('✅ International profile saved successfully.');
+}
+
+function renderInternationalData() {
+  const data = INTERNATIONAL_PROFILES[getCurrentUserKey()];
+  document.getElementById('intl-outside').value = data?.outsideIndia || 'no';
+  document.getElementById('intl-country').value = data?.country || '';
+  document.getElementById('intl-city').value = data?.city || '';
+  document.getElementById('intl-address').value = data?.address || '';
+  document.getElementById('intl-contact').value = data?.contact || '';
+  toggleInternationalFields(document.getElementById('intl-outside').value);
+}
+
+function toRad(d) { return (d * Math.PI) / 180; }
+function geoDistanceKm(lat1, lng1, lat2, lng2) {
+  const R = 6371;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+}
+
+function switchNearbyView(mode) {
+  nearbyView = mode;
+  document.getElementById('nearby-list-wrap').style.display = mode === 'list' ? 'block' : 'none';
+  document.getElementById('nearby-map-wrap').style.display = mode === 'map' ? 'block' : 'none';
+}
+
+function renderNearbyMembers() {
+  const listEl = document.getElementById('nearby-list');
+  listEl.innerHTML = nearbyResults.map(m => `
+    <div class="forum-post">
+      <div style="display:flex;justify-content:space-between;gap:10px;">
+        <div>
+          <div style="font-size:14px;font-weight:700;">${m.name}</div>
+          <div style="font-size:12px;color:var(--muted);">${m.location}, ${m.country}</div>
+          <div style="font-size:12px;margin-top:4px;">${m.profile}</div>
+        </div>
+        <span class="badge badge-state">${m.distanceKm != null ? m.distanceKm.toFixed(1) + ' km' : 'Manual'}</span>
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('nearby-map').innerHTML = nearbyResults.map(m => `<span class="map-dot">📍 ${m.name} • ${m.location}</span>`).join('');
+  switchNearbyView(nearbyView);
+}
+
+function findNearbyByCurrentLocation() {
+  const fallback = { lat: 13.0827, lng: 80.2707 };
+  const done = (lat, lng) => {
+    nearbyResults = MEMBER_GEO_DIRECTORY
+      .map(m => ({ ...m, distanceKm: geoDistanceKm(lat, lng, m.lat, m.lng) }))
+      .sort((a, b) => a.distanceKm - b.distanceKm)
+      .slice(0, 8);
+    renderNearbyMembers();
+  };
+  if (!navigator.geolocation) {
+    done(fallback.lat, fallback.lng);
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    pos => done(pos.coords.latitude, pos.coords.longitude),
+    () => done(fallback.lat, fallback.lng),
+    { enableHighAccuracy: true, timeout: 8000 }
+  );
+}
+
+function findNearbyByManualLocation() {
+  const q = document.getElementById('nearby-location-input').value.trim().toLowerCase();
+  nearbyResults = MEMBER_GEO_DIRECTORY
+    .filter(m => m.location.toLowerCase().includes(q) || m.country.toLowerCase().includes(q))
+    .map(m => ({ ...m, distanceKm: null }));
+  renderNearbyMembers();
+}
+
+function submitBusinessApplication() {
+  const payload = {
+    name: document.getElementById('biz-name').value.trim(),
+    category: document.getElementById('biz-category').value.trim(),
+    description: document.getElementById('biz-description').value.trim(),
+    contact: document.getElementById('biz-contact').value.trim(),
+    location: document.getElementById('biz-location').value.trim(),
+  };
+  if (!payload.name || !payload.category || !payload.description || !payload.contact || !payload.location) {
+    alert('Please fill all business fields.');
+    return;
+  }
+  BUSINESS_APPLICATIONS.unshift({ id: 'b' + Date.now(), ...payload, status: 'pending', submittedBy: USERS[currentRole].name, createdAt: new Date().toISOString() });
+  ['biz-name','biz-category','biz-description','biz-contact','biz-location'].forEach(id => { document.getElementById(id).value = ''; });
+  renderBusinessNetwork();
+  alert('✅ Business submitted to approval queue.');
+}
+
+function reviewBusiness(id, action) {
+  if (!['global_admin', 'state_admin'].includes(currentRole)) {
+    alert('Only Global/State Admin can approve or reject.');
+    return;
+  }
+  const row = BUSINESS_APPLICATIONS.find(b => b.id === id);
+  if (!row) return;
+  row.status = action;
+  row.reviewedBy = USERS[currentRole].name;
+  renderBusinessNetwork();
+}
+
+function renderBusinessNetwork() {
+  const approved = BUSINESS_APPLICATIONS.filter(b => b.status === 'approved');
+  document.getElementById('business-directory-list').innerHTML = approved.length
+    ? approved.map(b => `<div class="forum-post"><div style="font-weight:700;">${b.name}</div><div class="text-sm text-muted">${b.category} • ${b.location}</div><div class="text-sm mt-2">${b.description}</div><div class="text-sm mt-2">📞 ${b.contact}</div></div>`).join('')
+    : '<div class="text-muted">No approved businesses yet.</div>';
+  const showAdmin = ['global_admin', 'state_admin'].includes(currentRole);
+  document.getElementById('business-admin-review-wrap').style.display = showAdmin ? 'block' : 'none';
+  if (showAdmin) {
+    const pending = BUSINESS_APPLICATIONS.filter(b => b.status === 'pending');
+    document.getElementById('business-review-list').innerHTML = pending.length
+      ? pending.map(b => `<div class="forum-post"><div style="font-weight:700;">${b.name}</div><div class="text-sm text-muted">${b.category} • ${b.location} • by ${b.submittedBy}</div><div class="text-sm mt-2">${b.description}</div><div style="margin-top:10px;"><button class="btn btn-success btn-sm" onclick="reviewBusiness('${b.id}','approved')">Approve</button> <button class="btn btn-danger btn-sm" onclick="reviewBusiness('${b.id}','rejected')">Reject</button></div></div>`).join('')
+      : '<div class="text-muted">No pending business requests.</div>';
+  }
+}
+
+function addForumPost() {
+  const text = document.getElementById('forum-new-post').value.trim();
+  if (!text) return alert('Please enter a post.');
+  FORUM_POSTS.unshift({ id: 'f' + Date.now(), user: USERS[currentRole].name, role: currentRole, text, createdAt: new Date().toLocaleDateString(), comments: [] });
+  document.getElementById('forum-new-post').value = '';
+  renderStudentForum();
+}
+
+function addForumReply(postId) {
+  const input = document.getElementById('reply-' + postId);
+  const text = input.value.trim();
+  if (!text) return;
+  const post = FORUM_POSTS.find(p => p.id === postId);
+  if (!post) return;
+  post.comments.push({ user: USERS[currentRole].name, text });
+  input.value = '';
+  renderStudentForum();
+}
+
+function renderStudentForum() {
+  document.getElementById('forum-posts-list').innerHTML = FORUM_POSTS.map(p => `
+    <div class="forum-post">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <strong>${p.user}</strong><span class="text-muted">${p.createdAt}</span>
+      </div>
+      <div class="text-sm mt-2">${p.text}</div>
+      ${(p.comments || []).map(c => `<div class="forum-reply"><b>${c.user}:</b> ${c.text}</div>`).join('')}
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <input id="reply-${p.id}" class="form-control" placeholder="Write a response..." />
+        <button class="btn btn-outline btn-sm" onclick="addForumReply('${p.id}')">Reply</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function createPromoCode() {
+  if (!['global_admin', 'state_admin'].includes(currentRole)) {
+    alert('Only Global/State Admin can create promo codes.');
+    return;
+  }
+  const payload = {
+    code: document.getElementById('promo-code').value.trim().toUpperCase(),
+    offer: document.getElementById('promo-offer').value.trim(),
+    validity: document.getElementById('promo-validity').value,
+    targetType: document.getElementById('promo-target-type').value,
+    targetValue: document.getElementById('promo-target-value').value.trim().toLowerCase(),
+  };
+  if (!payload.code || !payload.offer || !payload.validity || !payload.targetValue) {
+    alert('Fill all promo fields.');
+    return;
+  }
+  PROMO_CODES.unshift({ id: 'p' + Date.now(), ...payload, createdBy: USERS[currentRole].name });
+  ['promo-code','promo-offer','promo-validity','promo-target-value'].forEach(id => { document.getElementById(id).value = ''; });
+  renderPromotions();
+}
+
+function isPromoVisibleForCurrentUser(promo) {
+  const user = USERS[currentRole];
+  const key = promo.targetValue;
+  if (promo.targetType === 'user') return user.name.toLowerCase().includes(key) || user.email.toLowerCase().includes(key);
+  if (promo.targetType === 'location') {
+    const intl = INTERNATIONAL_PROFILES[getCurrentUserKey()];
+    const locationText = `${user.scope} ${intl?.city || ''} ${intl?.country || ''}`.toLowerCase();
+    return locationText.includes(key);
+  }
+  if (promo.targetType === 'category') return currentRole.toLowerCase().includes(key) || user.role.toLowerCase().includes(key);
+  return false;
+}
+
+function renderPromotions() {
+  document.getElementById('promo-admin-create-wrap').style.display = ['global_admin', 'state_admin'].includes(currentRole) ? 'block' : 'none';
+  const today = new Date().toISOString().slice(0, 10);
+  const visible = PROMO_CODES.filter(p => p.validity >= today && isPromoVisibleForCurrentUser(p));
+  document.getElementById('promo-visible-list').innerHTML = visible.length
+    ? visible.map(p => `<div class="forum-post"><div style="display:flex;justify-content:space-between;"><strong>${p.code}</strong><span class="badge badge-approved">Valid till ${p.validity}</span></div><div class="text-sm mt-2">${p.offer}</div><div class="text-muted mt-2">Target: ${p.targetType} • ${p.targetValue}</div></div>`).join('')
+    : '<div class="text-muted">No promotions available for your profile.</div>';
+  document.getElementById('promo-apply-msg').textContent = '';
+}
+
+function applyPromoCode() {
+  const code = document.getElementById('promo-apply-input').value.trim().toUpperCase();
+  const msg = document.getElementById('promo-apply-msg');
+  const promo = PROMO_CODES.find(p => p.code === code);
+  if (!promo) return msg.textContent = 'Invalid promo code.';
+  const today = new Date().toISOString().slice(0, 10);
+  if (promo.validity < today) return msg.textContent = 'Promo code expired.';
+  if (!isPromoVisibleForCurrentUser(promo)) return msg.textContent = 'Promo code not available for your audience.';
+  msg.textContent = `✅ Promo applied: ${promo.offer}`;
+}
+
+// ===== INTERACTIONS =====
+function gotoPage(page) {
+  // Hide all pages
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  // Show target
+  const target = document.getElementById('page-' + page);
+  if (target) target.classList.add('active');
+  // Update nav
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.toggle('active', n.dataset.page === page);
+  });
+  // Update breadcrumb
+  const labels = { dashboard: '🏠 Dashboard', global: '🌐 Global Oversight', registrations: '📋 Registrations', 'family-trees': '🌳 Family Trees', communications: '📣 Communications', 'member-access': '🔐 Member Access', hierarchy: '🏗️ Hierarchy', district: '📍 District', matrimonial: '💍 Matrimonial', 'job-portal': '💼 Job Portal', profile: '👤 Profile', international: '🌍 International ID', 'nearby-members': '📍 Nearby Members', 'business-network': '🏢 Business Network', 'student-forum': '🎓 Student Forum', promotions: '🎁 Promotion Codes' };
+  document.getElementById('topbar-bc').textContent = labels[page] || page;
+  
+  // Render page-specific content
+  if (page === 'communications') renderCommsTable();
+  if (page === 'registrations') renderRegsTable();
+  if (page === 'family-trees') renderFamilyTrees();
+  if (page === 'member-access') renderMemberAccess();
+  if (page === 'international') renderInternationalData();
+  if (page === 'nearby-members') renderNearbyMembers();
+  if (page === 'business-network') renderBusinessNetwork();
+  if (page === 'student-forum') renderStudentForum();
+  if (page === 'promotions') renderPromotions();
+}
+
+function switchRole(role, btn) {
+  currentRole = role;
+  document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderSidebar(role);
+  renderStats(role);
+  renderAnnouncements(role);
+  renderLocalized(role);
+  renderUserInfo(role);
+  // Go back to dashboard
+  gotoPage('dashboard');
+  // Re-render alerts/community
+  renderAlerts(role);
+  renderCommunity();
+}
+
+function switchTab(tab, contentId) {
+  const container = tab.parentElement;
+  container.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  const parent = document.getElementById('page-communications');
+  parent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById(contentId).classList.add('active');
+}
+
+function showCreateForm() {
+  document.getElementById('create-form-section').style.display = 'block';
+  document.getElementById('create-form-section').scrollIntoView({ behavior: 'smooth' });
+}
+function hideCreateForm() {
+  document.getElementById('create-form-section').style.display = 'none';
+}
+function saveAnnouncement() {
+  alert('✅ Announcement saved and published successfully!');
+  hideCreateForm();
+}
+
+function toggleFeature(idx, feature, val) {
+  MEMBERS_ACCESS[idx][feature] = val;
+}
+function saveAccessSettings() {
+  alert('✅ Member access settings saved! Changes will take effect immediately for affected members.');
+}
+function approveReg(btn) {
+  const td = btn.closest('td');
+  td.innerHTML = '<span class="badge badge-approved">Approved</span>';
+}
+
+function selectLoginRole(btn, role, label) {
+  document.querySelectorAll('.login-role-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedLoginRole = role;
+  document.getElementById('login-email').value = USERS[role].email;
+}
+
+function doLogin() {
+  document.getElementById('login-page').style.display = 'none';
+  document.getElementById('main-app').style.display = 'flex';
+  currentRole = selectedLoginRole;
+  initApp(currentRole);
+  // Sync role switcher buttons
+  document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.role-btn').forEach(b => {
+    if (b.getAttribute('onclick').includes(currentRole)) b.classList.add('active');
+  });
+}
+
+function doLogout() {
+  document.getElementById('main-app').style.display = 'none';
+  document.getElementById('login-page').style.display = 'flex';
+}
+
+function initApp(role) {
+  renderSidebar(role);
+  renderStats(role);
+  renderAnnouncements(role);
+  renderEvents();
+  renderAlerts(role);
+  renderCommunity();
+  renderLocalized(role);
+  renderUserInfo(role);
+  gotoPage('dashboard');
+}
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', () => {
+  // Just show login, wait for user to click
+});
+</script>
+</body>
+</html>
